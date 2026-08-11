@@ -80,7 +80,7 @@ bridge. Add this to `claude_desktop_config.json`:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://<your-worker-subdomain>.workers.dev/mcp",
+        "https://mcp.thetax.nl/mcp",
         "--transport",
         "http-only"
       ]
@@ -96,13 +96,14 @@ bridge. Add this to `claude_desktop_config.json`:
   "servers": {
     "dutch-tax-income-calculator": {
       "type": "http",
-      "url": "https://<your-worker-subdomain>.workers.dev/mcp"
+      "url": "https://mcp.thetax.nl/mcp"
     }
   }
 }
 ```
 
-Replace `<your-worker-subdomain>` with the subdomain assigned after `npm run deploy` (or your custom domain).
+Deployed at `mcp.thetax.nl`; if you deploy your own copy, replace the URL with the workers.dev subdomain
+`npm run deploy` assigns (or your own custom domain).
 
 ## Project layout
 
