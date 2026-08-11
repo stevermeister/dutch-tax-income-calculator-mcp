@@ -35,7 +35,13 @@ export default {
 
     const url = new URL(request.url);
 
-    if (url.pathname !== MCP_ROUTE) {
+    // Only the bare root gets the friendly landing message. Everything else —
+    // including .well-known/oauth-* discovery paths — falls through to the
+    // MCP handler so it 404s naturally; this server has no auth, and clients
+    // that probe those well-known URLs need a real 404 to conclude that,
+    // rather than a 200 with an unrelated body that sends them into a broken
+    // OAuth registration attempt.
+    if (url.pathname === "/") {
       return new Response(
         "dutch-tax-income-calculator MCP server. Connect your MCP client to " +
           `${MCP_ROUTE}. Indicative calculations only — not tax advice.`,

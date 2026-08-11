@@ -36,6 +36,17 @@ describe("worker HTTP surface", () => {
     expect(text.toLowerCase()).toContain("not tax advice");
   });
 
+  it("404s on OAuth well-known discovery paths instead of masking them with the friendly 200", async () => {
+    // This server has no auth. A client probing these paths (as Claude Desktop's
+    // connector UI does before deciding whether to attempt OAuth) needs a real
+    // 404 to conclude "no auth here" — a 200 with an unrelated body sends it
+    // into a broken registration attempt instead.
+    for (const path of ["/.well-known/oauth-protected-resource", "/.well-known/oauth-authorization-server"]) {
+      const res = await SELF.fetch(`https://example.com${path}`);
+      expect(res.status).toBe(404);
+    }
+  });
+
   it("lists calculate_net_salary, calculate_gross_from_net and compare_scenarios tools", async () => {
     const body = await rpc("tools/list");
     const names = body.result.tools.map((t: { name: string }) => t.name);
