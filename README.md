@@ -80,7 +80,7 @@ bridge. Add this to `claude_desktop_config.json`:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://mcp.thetax.nl/mcp",
+        "https://thetax.nl/mcp",
         "--transport",
         "http-only"
       ]
@@ -96,14 +96,16 @@ bridge. Add this to `claude_desktop_config.json`:
   "servers": {
     "dutch-tax-income-calculator": {
       "type": "http",
-      "url": "https://mcp.thetax.nl/mcp"
+      "url": "https://thetax.nl/mcp"
     }
   }
 }
 ```
 
-Deployed at `mcp.thetax.nl`; if you deploy your own copy, replace the URL with the workers.dev subdomain
-`npm run deploy` assigns (or your own custom domain).
+Deployed at `thetax.nl/mcp` (a path-scoped route on the existing `thetax.nl` zone, not a custom domain — the
+rest of the site is unaffected). A human-readable setup page with these same instructions is served at
+[`thetax.nl/mcp/setup`](https://thetax.nl/mcp/setup). If you deploy your own copy, replace the URL with the
+workers.dev subdomain `npm run deploy` assigns (or your own domain/route).
 
 ## Project layout
 
@@ -111,6 +113,7 @@ Deployed at `mcp.thetax.nl`; if you deploy your own copy, replace the URL with t
 src/
   index.ts          Worker fetch handler: per-IP rate limit + createMcpHandler(createServer)
   server.ts          createServer() factory — registers the 3 tools and the tax://brackets/{year} resource
+  setup-page.ts       Renders the /mcp/setup HTML instructions page
   env.ts             Env (RATE_LIMITER binding) type
   tax/
     schemas.ts        Zod v4 input schemas

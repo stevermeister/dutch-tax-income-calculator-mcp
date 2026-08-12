@@ -36,6 +36,17 @@ describe("worker HTTP surface", () => {
     expect(text.toLowerCase()).toContain("not tax advice");
   });
 
+  it("serves the setup instructions page at /mcp/setup", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/setup");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    const html = await res.text();
+    expect(html).toContain("https://example.com/mcp");
+    expect(html).toContain("mcp-remote");
+    expect(html).toContain("claude_desktop_config.json");
+    expect(html.toLowerCase()).toContain("not tax advice");
+  });
+
   it("404s on OAuth well-known discovery paths instead of masking them with the friendly 200", async () => {
     // This server has no auth. A client probing these paths (as Claude Desktop's
     // connector UI does before deciding whether to attempt OAuth) needs a real

@@ -1,9 +1,11 @@
 import { createMcpHandler } from "agents/mcp/server";
 
 import { createServer } from "./server";
+import { renderSetupPage } from "./setup-page";
 import type { Env } from "./env";
 
 const MCP_ROUTE = "/mcp";
+const SETUP_ROUTE = "/mcp/setup";
 
 const mcpHandler = createMcpHandler(createServer, {
   route: MCP_ROUTE,
@@ -44,9 +46,15 @@ export default {
     if (url.pathname === "/") {
       return new Response(
         "dutch-tax-income-calculator MCP server. Connect your MCP client to " +
-          `${MCP_ROUTE}. Indicative calculations only — not tax advice.`,
+          `${MCP_ROUTE}. Setup instructions: ${url.origin}${SETUP_ROUTE}. Indicative calculations only — not tax advice.`,
         { headers: { "content-type": "text/plain; charset=utf-8" } }
       );
+    }
+
+    if (url.pathname === SETUP_ROUTE) {
+      return new Response(renderSetupPage(`${url.origin}${MCP_ROUTE}`), {
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
     }
 
     return mcpHandler(request, env, ctx);
