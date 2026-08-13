@@ -45,6 +45,26 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("mcp-remote");
     expect(html).toContain("claude_desktop_config.json");
     expect(html.toLowerCase()).toContain("not tax advice");
+    expect(html).toContain("Connectors");
+  });
+
+  it("redirects a browser landing on /mcp (or /mcp/) to the setup page", async () => {
+    for (const path of ["/mcp", "/mcp/"]) {
+      const res = await SELF.fetch(`https://example.com${path}`, {
+        redirect: "manual",
+        headers: { accept: "text/html,application/xhtml+xml" },
+      });
+      expect(res.status).toBe(302);
+      expect(res.headers.get("location")).toBe("https://example.com/mcp/setup");
+    }
+  });
+
+  it("does not redirect an actual MCP client GET on /mcp (no text/html Accept)", async () => {
+    const res = await SELF.fetch("https://example.com/mcp", {
+      redirect: "manual",
+      headers: { accept: "application/json, text/event-stream" },
+    });
+    expect(res.status).not.toBe(302);
   });
 
   it("404s on OAuth well-known discovery paths instead of masking them with the friendly 200", async () => {

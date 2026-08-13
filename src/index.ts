@@ -57,6 +57,15 @@ export default {
       });
     }
 
+    // A browser navigating to /mcp (or /mcp/) directly — as opposed to an MCP
+    // client's GET for the SSE stream, which asks for event-stream/json, not
+    // html — is a person who landed on the wrong URL. Send them to the human
+    // instructions instead of whatever the MCP handler would return.
+    const isBareMcpPath = url.pathname === MCP_ROUTE || url.pathname === `${MCP_ROUTE}/`;
+    if (isBareMcpPath && request.method === "GET" && (request.headers.get("accept") ?? "").includes("text/html")) {
+      return Response.redirect(`${url.origin}${SETUP_ROUTE}`, 302);
+    }
+
     return mcpHandler(request, env, ctx);
   },
 } satisfies ExportedHandler<Env>;

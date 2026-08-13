@@ -32,7 +32,7 @@ export function renderSetupPage(mcpUrl: string): string {
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Connect to the Dutch Tax MCP server</title>
+<title>Connect the Dutch Tax Calculator to Claude or ChatGPT</title>
 <style>
   :root {
     color-scheme: light dark;
@@ -47,6 +47,7 @@ export function renderSetupPage(mcpUrl: string): string {
     --warn-bg: #fff4e5;
     --warn-border: #f0c987;
     --warn-fg: #6b4400;
+    --step-bg: #ffffff;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -59,6 +60,7 @@ export function renderSetupPage(mcpUrl: string): string {
       --warn-bg: #2c2210;
       --warn-border: #6b4f14;
       --warn-fg: #f0c987;
+      --step-bg: #1a1c20;
     }
   }
   * { box-sizing: border-box; }
@@ -69,24 +71,26 @@ export function renderSetupPage(mcpUrl: string): string {
     font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
   main {
-    max-width: 720px;
+    max-width: 780px;
     margin: 0 auto;
     padding: 48px 20px 80px;
   }
   h1 { font-size: 1.7rem; margin-bottom: 0.3em; }
-  h2 { font-size: 1.15rem; margin-top: 2.4em; border-top: 1px solid var(--border); padding-top: 1.4em; }
+  h2 { font-size: 1.3rem; margin: 0 0 0.2em; }
   p { color: var(--muted); }
+  .lede { font-size: 1.05rem; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
-  .endpoint {
-    display: inline-block;
+  .url-box {
+    display: block;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 10px 14px;
+    padding: 14px 16px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     color: var(--accent);
-    font-size: 1.05rem;
-    margin: 8px 0 4px;
+    font-size: 1.1rem;
+    margin: 10px 0 4px;
+    word-break: break-all;
   }
   .warn {
     background: var(--warn-bg);
@@ -97,7 +101,48 @@ export function renderSetupPage(mcpUrl: string): string {
     margin: 20px 0;
     font-size: 0.95rem;
   }
-  pre {
+  .app-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 28px 0;
+    background: var(--card);
+  }
+  .app-card h2 { display: flex; align-items: center; gap: 10px; }
+  .badge {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+  ol.steps { padding-left: 1.3em; margin: 1em 0 0; }
+  ol.steps li { margin: 0 0 22px; color: var(--fg); }
+  ol.steps li p { margin: 4px 0 0; }
+  .shot {
+    margin-top: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    background: var(--step-bg);
+  }
+  .shot img { max-width: 100%; border-radius: 6px; display: block; }
+  ul.features { color: var(--muted); padding-left: 1.2em; }
+  ul.features li { margin: 0.3em 0; }
+  ul.features li code { color: var(--fg); }
+  a { color: var(--accent); }
+  details {
+    margin-top: 3em;
+    border-top: 1px solid var(--border);
+    padding-top: 1.2em;
+  }
+  summary { cursor: pointer; font-weight: 600; color: var(--fg); }
+  details pre {
     background: var(--code-bg);
     color: var(--code-fg);
     border-radius: 8px;
@@ -105,50 +150,84 @@ export function renderSetupPage(mcpUrl: string): string {
     overflow-x: auto;
     font-size: 0.85rem;
     line-height: 1.5;
+    margin-top: 1em;
   }
-  ul { color: var(--muted); padding-left: 1.2em; }
-  li { margin: 0.3em 0; }
-  li code { color: var(--fg); }
-  a { color: var(--accent); }
-  footer { margin-top: 3em; color: var(--muted); font-size: 0.85rem; }
+  footer { margin-top: 2em; color: var(--muted); font-size: 0.85rem; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Dutch Tax Income Calculator — MCP server</h1>
-  <p>Connect any MCP client to the endpoint below to calculate Dutch net/gross salary, compare scenarios, and
-  read official tax bracket data — all computed by the
-  <a href="https://www.npmjs.com/package/dutch-tax-income-calculator" rel="noopener">dutch-tax-income-calculator</a>
-  npm package, never reimplemented here.</p>
+  <h1>Dutch Tax Income Calculator</h1>
+  <p class="lede">Use this inside Claude or ChatGPT to calculate Dutch net/gross salary, compare scenarios,
+  and look up official tax brackets — right in the chat, no spreadsheet needed.</p>
 
   <div class="warn">Indicative only — not tax advice. Confirm with a qualified Dutch tax advisor or the
-  Belastingdienst before acting on any number this server returns.</div>
+  Belastingdienst before acting on any number this returns.</div>
 
-  <h2>Endpoint</h2>
-  <div class="endpoint">${mcpUrl}</div>
-  <p>Streamable HTTP transport. No authentication required. Rate-limited to 60 requests/minute per client.</p>
+  <p><strong>Server address</strong> — you'll paste this into Claude or ChatGPT below:</p>
+  <div class="url-box">${mcpUrl}</div>
 
-  <h2>Claude Desktop</h2>
-  <p>Add this to your <code>claude_desktop_config.json</code> (Settings → Developer → Edit Config):</p>
-  <pre>${escapeHtml(claudeDesktopConfig)}</pre>
+  <section class="app-card">
+    <h2>Claude <span class="badge">Claude.ai &amp; Claude Desktop</span></h2>
+    <ol class="steps">
+      <li>Open <strong>Settings → Connectors</strong>.
+        <div class="shot">Screenshot: Connectors settings page</div>
+      </li>
+      <li>Click the <strong>+</strong> button, then <strong>Add custom connector</strong>.
+        <div class="shot">Screenshot: "Add custom connector" dialog</div>
+      </li>
+      <li>Give it a name (e.g. "Dutch Tax Calculator") and paste the server address above into the
+        <strong>Remote MCP server URL</strong> field.
+        <p>Leave the OAuth Client ID / Secret fields empty — this server doesn't need them.</p>
+      </li>
+      <li>Click <strong>Add</strong>, then <strong>Connect</strong>.
+        <div class="shot">Screenshot: connector added and connected</div>
+      </li>
+      <li>In any chat, open the <strong>+</strong> menu and turn the connector on to start using it.</li>
+    </ol>
+  </section>
 
-  <h2>VS Code, Cursor, and other <code>mcp.json</code> clients</h2>
-  <pre>${escapeHtml(mcpJsonConfig)}</pre>
+  <section class="app-card">
+    <h2>ChatGPT <span class="badge">Plus, Pro, Team, Enterprise</span></h2>
+    <ol class="steps">
+      <li>Go to <strong>Settings → Apps → Advanced settings</strong> and turn on <strong>Developer mode</strong>
+        (only needs to be done once).
+        <div class="shot">Screenshot: Developer mode toggle</div>
+      </li>
+      <li>Go to <strong>Settings → Connectors</strong> and click <strong>Create</strong>.
+        <div class="shot">Screenshot: Connectors → Create</div>
+      </li>
+      <li>Enter a name, paste the server address above into the <strong>MCP server URL</strong> field, and
+        choose <strong>No authentication</strong>.
+        <div class="shot">Screenshot: filled-in connector form</div>
+      </li>
+      <li>Save it, then enable the connector from the <strong>+</strong> / tools menu in a chat.</li>
+    </ol>
+  </section>
 
-  <h2>What's available</h2>
-  <ul>
-    <li><code>calculate_net_salary</code> — gross → net for a given tax year</li>
-    <li><code>calculate_gross_from_net</code> — net → gross, including the package's own plateau / no-solution
-      results when a net figure isn't uniquely (or at all) achievable</li>
-    <li><code>compare_scenarios</code> — compare 2–5 salary scenarios side by side with a comparison table</li>
-    <li><code>tax://brackets/{year}</code> — resource exposing the raw payroll tax, social security, and credit
-      brackets for a given year</li>
+  <h2 style="margin-top:2.5em;">What it can do</h2>
+  <ul class="features">
+    <li>Calculate net salary from gross income, for any supported tax year</li>
+    <li>Work backwards from a target net salary to find the matching gross</li>
+    <li>Compare 2–5 salary scenarios side by side (different years, hours, 30% ruling, etc.)</li>
+    <li>Look up the official payroll tax, social security, and credit brackets for a given year</li>
   </ul>
 
-  <h2>Privacy</h2>
-  <p>No request bodies, tool arguments, or calculated amounts are ever logged.</p>
+  <details>
+    <summary>For developers</summary>
+    <p>Streamable HTTP MCP transport, no authentication, rate-limited to 60 requests/minute per client.</p>
 
-  <footer>Source and README: <a href="${REPO_URL}" rel="noopener">${REPO_URL}</a></footer>
+    <p><code>claude_desktop_config.json</code> (manual config via the
+    <a href="https://www.npmjs.com/package/mcp-remote" rel="noopener">mcp-remote</a> bridge):</p>
+    <pre>${escapeHtml(claudeDesktopConfig)}</pre>
+
+    <p><code>mcp.json</code> (VS Code, Cursor, and other clients supporting the standard config format):</p>
+    <pre>${escapeHtml(mcpJsonConfig)}</pre>
+
+    <p>Source and README: <a href="${REPO_URL}" rel="noopener">${REPO_URL}</a></p>
+  </details>
+
+  <footer>No request bodies, tool arguments, or calculated amounts are ever logged.</footer>
 </main>
 </body>
 </html>
