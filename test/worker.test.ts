@@ -36,8 +36,8 @@ describe("worker HTTP surface", () => {
     expect(text.toLowerCase()).toContain("not tax advice");
   });
 
-  it("serves the setup instructions page at /mcp/setup", async () => {
-    const res = await SELF.fetch("https://example.com/mcp/setup");
+  it("serves the setup instructions page at /mcp/setup.html", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/setup.html");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const html = await res.text();
@@ -48,6 +48,12 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("Connectors");
   });
 
+  it("redirects the old extension-less /mcp/setup to /mcp/setup.html", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/setup", { redirect: "manual" });
+    expect(res.status).toBe(302);
+    expect(res.headers.get("location")).toBe("https://example.com/mcp/setup.html");
+  });
+
   it("redirects a browser landing on /mcp (or /mcp/) to the setup page", async () => {
     for (const path of ["/mcp", "/mcp/"]) {
       const res = await SELF.fetch(`https://example.com${path}`, {
@@ -55,7 +61,7 @@ describe("worker HTTP surface", () => {
         headers: { accept: "text/html,application/xhtml+xml" },
       });
       expect(res.status).toBe(302);
-      expect(res.headers.get("location")).toBe("https://example.com/mcp/setup");
+      expect(res.headers.get("location")).toBe("https://example.com/mcp/setup.html");
     }
   });
 

@@ -5,7 +5,13 @@ import { renderSetupPage } from "./setup-page";
 import type { Env } from "./env";
 
 const MCP_ROUTE = "/mcp";
-const SETUP_ROUTE = "/mcp/setup";
+// .html on purpose: Angular's default service-worker config (thetax.nl's
+// main app runs one) only treats extension-less URLs as SPA navigation
+// routes to intercept from cache — a URL with a dot in the last segment
+// falls through to the network, reaching this Worker instead of being
+// served from the app shell's cache.
+const SETUP_ROUTE = "/mcp/setup.html";
+const LEGACY_SETUP_ROUTE = "/mcp/setup";
 
 const mcpHandler = createMcpHandler(createServer, {
   route: MCP_ROUTE,
@@ -55,6 +61,13 @@ export default {
       return new Response(renderSetupPage(`${url.origin}${MCP_ROUTE}`), {
         headers: { "content-type": "text/html; charset=utf-8" },
       });
+    }
+
+    // Old extension-less URL: still susceptible to the service-worker
+    // interception described above on a repeat visit, but redirects cleanly
+    // for anyone hitting it fresh (no service worker installed yet).
+    if (url.pathname === LEGACY_SETUP_ROUTE) {
+      return Response.redirect(`${url.origin}${SETUP_ROUTE}`, 302);
     }
 
     // A browser navigating to /mcp (or /mcp/) directly — as opposed to an MCP
