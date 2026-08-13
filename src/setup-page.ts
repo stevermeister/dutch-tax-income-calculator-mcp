@@ -135,6 +135,17 @@ export function renderSetupPage(mcpUrl: string): string {
   ul.features { color: var(--muted); padding-left: 1.2em; }
   ul.features li { margin: 0.3em 0; }
   ul.features li code { color: var(--fg); }
+  .prompts { list-style: none; padding: 0; margin: 14px 0 0; }
+  .prompts li {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    color: var(--fg);
+    font-size: 0.95rem;
+  }
   a { color: var(--accent); }
   details {
     margin-top: 3em;
@@ -158,14 +169,23 @@ export function renderSetupPage(mcpUrl: string): string {
 <body>
 <main>
   <h1>Dutch Tax Income Calculator</h1>
-  <p class="lede">Use this inside Claude or ChatGPT to calculate Dutch net/gross salary, compare scenarios,
-  and look up official tax brackets — right in the chat, no spreadsheet needed.</p>
+  <p class="lede">Ask Claude or ChatGPT a question about Dutch salary, tax, or take-home pay, and get a real
+  answer computed from the official brackets — no spreadsheet, no manually looking up rates. Setup takes about
+  two minutes.</p>
 
   <div class="warn">Indicative only — not tax advice. Confirm with a qualified Dutch tax advisor or the
   Belastingdienst before acting on any number this returns.</div>
 
   <p><strong>Server address</strong> — you'll paste this into Claude or ChatGPT below:</p>
   <div class="url-box">${mcpUrl}</div>
+
+  <p style="margin-top:28px;"><strong>Once connected, just ask things like:</strong></p>
+  <ul class="prompts">
+    <li>"What's my net salary if I earn €65,000 gross in 2026?"</li>
+    <li>"How much do I need to earn gross to take home €3,500 a month?"</li>
+    <li>"Compare my take-home pay at €50k vs €60k gross, with and without the 30% ruling"</li>
+    <li>"What are the 2026 Dutch payroll tax brackets?"</li>
+  </ul>
 
   <section class="app-card">
     <h2>Claude <span class="badge">Claude.ai &amp; Claude Desktop</span></h2>
@@ -190,15 +210,13 @@ export function renderSetupPage(mcpUrl: string): string {
   <section class="app-card">
     <h2>ChatGPT <span class="badge">Plus, Pro, Team, Enterprise</span></h2>
     <ol class="steps">
-      <li>Go to <strong>Settings → Apps → Advanced settings</strong> and turn on <strong>Developer mode</strong>
-        (only needs to be done once).
-        <div class="shot">Screenshot: Developer mode toggle</div>
+      <li>Look for a way to add a custom connector or MCP server — check <strong>Settings → Plugins</strong>,
+        or the <strong>+</strong> / tools button inside a chat's message box. ChatGPT has moved this around
+        between releases, so the exact spot depends on your version.
+        <div class="shot">Screenshot: where the connector option lives</div>
       </li>
-      <li>Go to <strong>Settings → Connectors</strong> and click <strong>Create</strong>.
-        <div class="shot">Screenshot: Connectors → Create</div>
-      </li>
-      <li>Enter a name, paste the server address above into the <strong>MCP server URL</strong> field, and
-        choose <strong>No authentication</strong>.
+      <li>Enter a name, paste the server address above into the server/MCP URL field, and choose
+        <strong>No authentication</strong>.
         <div class="shot">Screenshot: filled-in connector form</div>
       </li>
       <li>Save it, then enable the connector from the <strong>+</strong> / tools menu in a chat.</li>
