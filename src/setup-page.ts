@@ -1,3 +1,11 @@
+import {
+  DEVELOPER_MODE,
+  PLUGINS_TAB,
+  BROWSE_PLUGINS,
+  NEW_PLUGIN_FORM,
+  CONNECT_CONFIRM,
+} from "./chatgpt-screenshots";
+
 const REPO_URL = "https://github.com/stevermeister/dutch-tax-income-calculator-mcp";
 
 export function renderSetupPage(mcpUrl: string): string {
@@ -132,6 +140,14 @@ export function renderSetupPage(mcpUrl: string): string {
     background: var(--step-bg);
   }
   .shot img { max-width: 100%; border-radius: 6px; display: block; }
+  .screenshot {
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--step-bg);
+  }
+  .screenshot img { display: block; width: 100%; }
   ul.features { color: var(--muted); padding-left: 1.2em; }
   ul.features li { margin: 0.3em 0; }
   ul.features li code { color: var(--fg); }
@@ -208,18 +224,29 @@ export function renderSetupPage(mcpUrl: string): string {
   </section>
 
   <section class="app-card">
-    <h2>ChatGPT <span class="badge">Plus, Pro, Team, Enterprise</span></h2>
+    <h2>ChatGPT <span class="badge">Web, Developer mode required</span></h2>
     <ol class="steps">
-      <li>Look for a way to add a custom connector or MCP server — check <strong>Settings → Plugins</strong>,
-        or the <strong>+</strong> / tools button inside a chat's message box. ChatGPT has moved this around
-        between releases, so the exact spot depends on your version.
-        <div class="shot">Screenshot: where the connector option lives</div>
+      <li>Go to <strong>Settings → Security and login</strong> and turn on <strong>Developer mode</strong>
+        (only needs to be done once). ChatGPT will flag it as elevated risk — that's expected, it's what
+        gates custom/unverified connectors like this one.
+        <div class="screenshot"><img src="${DEVELOPER_MODE}" alt="ChatGPT Settings → Security and login, with the Developer mode toggle turned on" /></div>
       </li>
-      <li>Enter a name, paste the server address above into the server/MCP URL field, and choose
-        <strong>No authentication</strong>.
-        <div class="shot">Screenshot: filled-in connector form</div>
+      <li>Go to <strong>Settings → Plugins</strong>.
+        <div class="screenshot"><img src="${PLUGINS_TAB}" alt="ChatGPT Settings → Plugins page, listing installed plugins and a Browse plugins entry" /></div>
       </li>
-      <li>Save it, then enable the connector from the <strong>+</strong> / tools menu in a chat.</li>
+      <li>Click <strong>Browse plugins</strong>, then the <strong>+</strong> button in the top right.
+        <div class="screenshot"><img src="${BROWSE_PLUGINS}" alt="ChatGPT Plugins gallery with a + button in the top right to add a new plugin" /></div>
+      </li>
+      <li>Fill in the form: a <strong>Name</strong> (e.g. "Dutch Income Tax"), under <strong>Connection</strong>
+        choose <strong>Server URL</strong> and paste the server address from above, set
+        <strong>Authentication</strong> to <strong>No Auth</strong>, tick <strong>"I understand and want to
+        continue"</strong>, then click <strong>Create</strong>.
+        <div class="screenshot"><img src="${NEW_PLUGIN_FORM}" alt="ChatGPT New Plugin form filled in with name, server URL, and No Auth selected" /></div>
+      </li>
+      <li>Click <strong>Connect</strong> in the confirmation popup.
+        <div class="screenshot"><img src="${CONNECT_CONFIRM}" alt="ChatGPT confirmation popup to add the plugin, with a Connect button" /></div>
+      </li>
+      <li>It's now in your installed plugins — use it from the Plugins (<strong>@</strong>) menu in any chat.</li>
     </ol>
   </section>
 
