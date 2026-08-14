@@ -3,8 +3,13 @@ import {
   PLUGINS_TAB,
   BROWSE_PLUGINS,
   NEW_PLUGIN_FORM,
-  CONNECT_CONFIRM,
+  CONNECT_CONFIRM as CHATGPT_CONNECT_CONFIRM,
 } from "./chatgpt-screenshots";
+import {
+  CONNECTORS_ADD_MENU,
+  ADD_CUSTOM_CONNECTOR_FORM,
+  CONNECT_CONFIRM as CLAUDE_CONNECT_CONFIRM,
+} from "./claude-screenshots";
 
 const REPO_URL = "https://github.com/stevermeister/dutch-tax-income-calculator-mcp";
 
@@ -129,17 +134,6 @@ export function renderSetupPage(mcpUrl: string): string {
   ol.steps { padding-left: 1.3em; margin: 1em 0 0; }
   ol.steps li { margin: 0 0 22px; color: var(--fg); }
   ol.steps li p { margin: 4px 0 0; }
-  .shot {
-    margin-top: 10px;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 28px 16px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.85rem;
-    background: var(--step-bg);
-  }
-  .shot img { max-width: 100%; border-radius: 6px; display: block; }
   .screenshot {
     margin-top: 10px;
     border: 1px solid var(--border);
@@ -206,18 +200,17 @@ export function renderSetupPage(mcpUrl: string): string {
   <section class="app-card">
     <h2>Claude <span class="badge">Claude.ai &amp; Claude Desktop</span></h2>
     <ol class="steps">
-      <li>Open <strong>Settings → Connectors</strong>.
-        <div class="shot">Screenshot: Connectors settings page</div>
+      <li>Open <strong>Settings → Connectors</strong>, click <strong>Add</strong> (top right), then
+        <strong>Add custom connector</strong>.
+        <div class="screenshot"><img src="${CONNECTORS_ADD_MENU}" alt="Claude Settings → Connectors page, with the Add menu open showing Browse connectors and Add custom connector" /></div>
       </li>
-      <li>Click the <strong>+</strong> button, then <strong>Add custom connector</strong>.
-        <div class="shot">Screenshot: "Add custom connector" dialog</div>
+      <li>Enter a name (e.g. "Dutch Tax Calculator") in the first field, and the server address from above
+        in the second field. Leave <strong>Advanced settings</strong> (OAuth Client ID / Secret) empty — this
+        server doesn't need them — then click <strong>Add</strong>.
+        <div class="screenshot"><img src="${ADD_CUSTOM_CONNECTOR_FORM}" alt="Claude Add custom connector dialog filled in with a name and the server URL" /></div>
       </li>
-      <li>Give it a name (e.g. "Dutch Tax Calculator") and paste the server address above into the
-        <strong>Remote MCP server URL</strong> field.
-        <p>Leave the OAuth Client ID / Secret fields empty — this server doesn't need them.</p>
-      </li>
-      <li>Click <strong>Add</strong>, then <strong>Connect</strong>.
-        <div class="shot">Screenshot: connector added and connected</div>
+      <li>Click <strong>Connect</strong>.
+        <div class="screenshot"><img src="${CLAUDE_CONNECT_CONFIRM}" alt="Claude connector detail page showing a Connect button before the connector is connected" /></div>
       </li>
       <li>In any chat, open the <strong>+</strong> menu and turn the connector on to start using it.</li>
     </ol>
@@ -244,7 +237,7 @@ export function renderSetupPage(mcpUrl: string): string {
         <div class="screenshot"><img src="${NEW_PLUGIN_FORM}" alt="ChatGPT New Plugin form filled in with name, server URL, and No Auth selected" /></div>
       </li>
       <li>Click <strong>Connect</strong> in the confirmation popup.
-        <div class="screenshot"><img src="${CONNECT_CONFIRM}" alt="ChatGPT confirmation popup to add the plugin, with a Connect button" /></div>
+        <div class="screenshot"><img src="${CHATGPT_CONNECT_CONFIRM}" alt="ChatGPT confirmation popup to add the plugin, with a Connect button" /></div>
       </li>
       <li>It's now in your installed plugins — use it from the Plugins (<strong>@</strong>) menu in any chat.</li>
     </ol>

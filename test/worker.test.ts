@@ -73,6 +73,17 @@ describe("worker HTTP surface", () => {
     expect(res.status).not.toBe(302);
   });
 
+  it("serves real MCP traffic on /mcp/ (trailing slash) the same as /mcp", async () => {
+    // Some connector UIs (and people) type the URL with a trailing slash.
+    // A client that always calls the exact URL it was given must not 404.
+    const res = await SELF.fetch("https://example.com/mcp/", {
+      method: "POST",
+      headers: JSON_RPC_HEADERS,
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+    });
+    expect(res.status).toBe(200);
+  });
+
   it("404s on OAuth well-known discovery paths instead of masking them with the friendly 200", async () => {
     // This server has no auth. A client probing these paths (as Claude Desktop's
     // connector UI does before deciding whether to attempt OAuth) needs a real

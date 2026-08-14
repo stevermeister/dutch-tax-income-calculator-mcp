@@ -41,7 +41,16 @@ export default {
       return rateLimitedResponse();
     }
 
-    const url = new URL(request.url);
+    // Normalize a trailing slash (e.g. "/mcp/" -> "/mcp") before routing.
+    // People (and apparently some connector UIs) type the URL either way,
+    // and a client that always calls the exact URL it was given — including
+    // the slash — would otherwise 404 on every request.
+    let url = new URL(request.url);
+    if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+      url = new URL(url);
+      url.pathname = url.pathname.slice(0, -1);
+      request = new Request(url.toString(), request);
+    }
 
     // Only the bare root gets the friendly landing message. Everything else —
     // including .well-known/oauth-* discovery paths — falls through to the
@@ -70,12 +79,15 @@ export default {
       return Response.redirect(`${url.origin}${SETUP_ROUTE}`, 302);
     }
 
-    // A browser navigating to /mcp (or /mcp/) directly — as opposed to an MCP
-    // client's GET for the SSE stream, which asks for event-stream/json, not
-    // html — is a person who landed on the wrong URL. Send them to the human
+    // A browser navigating to /mcp directly — as opposed to an MCP client's
+    // GET for the SSE stream, which asks for event-stream/json, not html —
+    // is a person who landed on the wrong URL. Send them to the human
     // instructions instead of whatever the MCP handler would return.
-    const isBareMcpPath = url.pathname === MCP_ROUTE || url.pathname === `${MCP_ROUTE}/`;
-    if (isBareMcpPath && request.method === "GET" && (request.headers.get("accept") ?? "").includes("text/html")) {
+    if (
+      url.pathname === MCP_ROUTE &&
+      request.method === "GET" &&
+      (request.headers.get("accept") ?? "").includes("text/html")
+    ) {
       return Response.redirect(`${url.origin}${SETUP_ROUTE}`, 302);
     }
 
