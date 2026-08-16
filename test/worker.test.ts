@@ -68,6 +68,21 @@ describe("worker HTTP surface", () => {
     expect(setupHtml).toContain("https://example.com/mcp/privacy.html");
   });
 
+  it("serves the icon at /mcp/icon.png, referenced as a favicon on both pages", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/icon.png");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toBe("image/png");
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    expect(bytes.length).toBeGreaterThan(100);
+    // PNG magic number
+    expect([bytes[0], bytes[1], bytes[2], bytes[3]]).toEqual([0x89, 0x50, 0x4e, 0x47]);
+
+    const setupHtml = await (await SELF.fetch("https://example.com/mcp/setup.html")).text();
+    expect(setupHtml).toContain("https://example.com/mcp/icon.png");
+    const privacyHtml = await (await SELF.fetch("https://example.com/mcp/privacy.html")).text();
+    expect(privacyHtml).toContain("https://example.com/mcp/icon.png");
+  });
+
   it("redirects a browser landing on /mcp (or /mcp/) to the setup page", async () => {
     for (const path of ["/mcp", "/mcp/"]) {
       const res = await SELF.fetch(`https://example.com${path}`, {

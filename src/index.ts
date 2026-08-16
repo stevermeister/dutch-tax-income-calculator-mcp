@@ -3,6 +3,7 @@ import { createMcpHandler } from "agents/mcp/server";
 import { createServer } from "./server";
 import { renderSetupPage } from "./setup-page";
 import { renderPrivacyPage } from "./privacy-page";
+import { ICON_PNG_BASE64 } from "./icon";
 import type { Env } from "./env";
 
 const MCP_ROUTE = "/mcp";
@@ -14,6 +15,16 @@ const MCP_ROUTE = "/mcp";
 const SETUP_ROUTE = "/mcp/setup.html";
 const LEGACY_SETUP_ROUTE = "/mcp/setup";
 const PRIVACY_ROUTE = "/mcp/privacy.html";
+const ICON_ROUTE = "/mcp/icon.png";
+
+function base64ToBytes(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+const ICON_BYTES = base64ToBytes(ICON_PNG_BASE64);
 
 const mcpHandler = createMcpHandler(createServer, {
   route: MCP_ROUTE,
@@ -77,6 +88,12 @@ export default {
     if (url.pathname === PRIVACY_ROUTE) {
       return new Response(renderPrivacyPage(`${url.origin}${MCP_ROUTE}`), {
         headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+
+    if (url.pathname === ICON_ROUTE) {
+      return new Response(ICON_BYTES, {
+        headers: { "content-type": "image/png", "cache-control": "public, max-age=86400" },
       });
     }
 

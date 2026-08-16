@@ -46,6 +46,7 @@ export function renderSetupPage(mcpUrl: string): string {
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Connect the Dutch Tax Calculator to Claude or ChatGPT</title>
+<link rel="icon" type="image/png" href="${new URL(mcpUrl).origin}/mcp/icon.png" />
 <style>
   :root {
     color-scheme: light dark;

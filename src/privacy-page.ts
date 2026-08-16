@@ -7,6 +7,7 @@ export function renderPrivacyPage(mcpUrl: string): string {
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Privacy Policy — Dutch Tax Income Calculator MCP server</title>
+<link rel="icon" type="image/png" href="${new URL(mcpUrl).origin}/mcp/icon.png" />
 <style>
   :root {
     color-scheme: light dark;

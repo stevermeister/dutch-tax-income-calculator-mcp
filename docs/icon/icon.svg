@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#0ea5a6" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+
+  <!-- Euro glyph, drawn as vector paths so it renders identically everywhere -->
+  <path d="M 336 176
+           A 118 118 0 1 0 336 340"
+        fill="none" stroke="#ffffff" stroke-width="46"
+        stroke-linecap="round" />
+  <rect x="140" y="228" width="180" height="34" rx="17" fill="#ffffff" />
+  <rect x="140" y="284" width="180" height="34" rx="17" fill="#ffffff" />
+</svg>
