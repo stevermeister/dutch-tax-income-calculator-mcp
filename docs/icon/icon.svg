@@ -8,11 +8,19 @@
 
   <rect width="512" height="512" rx="112" fill="url(#bg)" />
 
-  <!-- Euro glyph, drawn as vector paths so it renders identically everywhere -->
-  <path d="M 336 176
-           A 118 118 0 1 0 336 340"
-        fill="none" stroke="#ffffff" stroke-width="46"
-        stroke-linecap="round" />
-  <rect x="140" y="228" width="180" height="34" rx="17" fill="#ffffff" />
-  <rect x="140" y="284" width="180" height="34" rx="17" fill="#ffffff" />
+  <!-- Full euro sign, shifted up-left to leave room for the badge -->
+  <g transform="translate(-28 -28) scale(0.86)" transform-origin="256 256">
+    <path d="M 336 176
+             A 118 118 0 1 0 336 340"
+          fill="none" stroke="#ffffff" stroke-width="46"
+          stroke-linecap="round" />
+    <rect x="140" y="228" width="180" height="34" rx="17" fill="#ffffff" />
+    <rect x="140" y="284" width="180" height="34" rx="17" fill="#ffffff" />
+  </g>
+
+  <!-- Verified badge, bottom right -->
+  <circle cx="378" cy="378" r="76" fill="#10b981" stroke="#0ea5a6" stroke-width="6" />
+  <path d="M 346 380 L 368 402 L 414 354"
+        fill="none" stroke="#ffffff" stroke-width="20"
+        stroke-linecap="round" stroke-linejoin="round" />
 </svg>
