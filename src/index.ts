@@ -2,6 +2,7 @@ import { createMcpHandler } from "agents/mcp/server";
 
 import { createServer } from "./server";
 import { renderSetupPage } from "./setup-page";
+import { renderPrivacyPage } from "./privacy-page";
 import type { Env } from "./env";
 
 const MCP_ROUTE = "/mcp";
@@ -12,6 +13,7 @@ const MCP_ROUTE = "/mcp";
 // served from the app shell's cache.
 const SETUP_ROUTE = "/mcp/setup.html";
 const LEGACY_SETUP_ROUTE = "/mcp/setup";
+const PRIVACY_ROUTE = "/mcp/privacy.html";
 
 const mcpHandler = createMcpHandler(createServer, {
   route: MCP_ROUTE,
@@ -68,6 +70,12 @@ export default {
 
     if (url.pathname === SETUP_ROUTE) {
       return new Response(renderSetupPage(`${url.origin}${MCP_ROUTE}`), {
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+
+    if (url.pathname === PRIVACY_ROUTE) {
+      return new Response(renderPrivacyPage(`${url.origin}${MCP_ROUTE}`), {
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     }

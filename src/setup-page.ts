@@ -265,7 +265,8 @@ export function renderSetupPage(mcpUrl: string): string {
     <p>Source and README: <a href="${REPO_URL}" rel="noopener">${REPO_URL}</a></p>
   </details>
 
-  <footer>No request bodies, tool arguments, or calculated amounts are ever logged.</footer>
+  <footer>No request bodies, tool arguments, or calculated amounts are ever logged. ·
+    <a href="${new URL(mcpUrl).origin}/mcp/privacy.html" rel="noopener">Privacy Policy</a></footer>
 </main>
 </body>
 </html>

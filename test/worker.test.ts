@@ -54,6 +54,20 @@ describe("worker HTTP surface", () => {
     expect(res.headers.get("location")).toBe("https://example.com/mcp/setup.html");
   });
 
+  it("serves the privacy policy at /mcp/privacy.html, linked from the setup page", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/privacy.html");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    const html = await res.text();
+    expect(html.toLowerCase()).toContain("privacy policy");
+    expect(html).toContain("Data collection");
+    expect(html).toContain("Data retention");
+    expect(html).toContain("Contact");
+
+    const setupHtml = await (await SELF.fetch("https://example.com/mcp/setup.html")).text();
+    expect(setupHtml).toContain("https://example.com/mcp/privacy.html");
+  });
+
   it("redirects a browser landing on /mcp (or /mcp/) to the setup page", async () => {
     for (const path of ["/mcp", "/mcp/"]) {
       const res = await SELF.fetch(`https://example.com${path}`, {
@@ -103,6 +117,8 @@ describe("worker HTTP surface", () => {
     );
     for (const tool of body.result.tools) {
       expect(tool.description.toLowerCase()).toContain("not tax advice");
+      expect(tool.title).toBeTruthy();
+      expect(tool.annotations?.readOnlyHint).toBe(true);
     }
   });
 

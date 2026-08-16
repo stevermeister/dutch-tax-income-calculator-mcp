@@ -14,6 +14,15 @@ import { runSalaryPaycheck, runNetToGross, toPlainPaycheck, isGrossPlateau } fro
 
 const NOT_TAX_ADVICE = "Indicative only — not tax advice.";
 
+// All three tools are pure, deterministic calculations over the request's own
+// input — no writes, no side effects, same input always yields the same
+// output, and no interaction with an open/unpredictable external world.
+const READ_ONLY_ANNOTATIONS = {
+  readOnlyHint: true,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
 function toolError(err: unknown): CallToolResult {
   const message = err instanceof Error ? err.message : String(err);
   return { content: [{ type: "text", text: message }], isError: true };
@@ -37,6 +46,7 @@ export function createServer(): McpServer {
         `Calculate net Dutch salary from gross income for a given tax year, using the dutch-tax-income-calculator ` +
         `package's official Belastingdienst payroll tax tables (SalaryPaycheck). ${NOT_TAX_ADVICE}`,
       inputSchema: CalculateNetSalaryInput,
+      annotations: READ_ONLY_ANNOTATIONS,
     },
     async (args) => {
       try {
@@ -76,6 +86,7 @@ export function createServer(): McpServer {
         `the package's exact plateau bounds (grossLow/grossHigh) are returned verbatim instead of a single value. ` +
         `If no gross produces the target net, the package's "no solution" error message is returned verbatim. ${NOT_TAX_ADVICE}`,
       inputSchema: CalculateGrossFromNetInput,
+      annotations: READ_ONLY_ANNOTATIONS,
     },
     async (args) => {
       try {
@@ -175,6 +186,7 @@ export function createServer(): McpServer {
         `each computed with the dutch-tax-income-calculator package. Returns a per-scenario breakdown plus a ` +
         `comparison table. ${NOT_TAX_ADVICE}`,
       inputSchema: CompareScenariosInput,
+      annotations: READ_ONLY_ANNOTATIONS,
     },
     async (args) => {
       const rows: ComparisonRow[] = [];

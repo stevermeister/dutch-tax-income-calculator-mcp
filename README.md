@@ -53,6 +53,7 @@ No Hono, no Express — `src/index.ts` is the whole HTTP layer.
   every request. Exceeding it returns `429` with a `Retry-After` header.
 - **Zero logging of input values.** The handler never logs request bodies, tool arguments, or calculated
   amounts. The client IP is used only as an ephemeral rate-limit counter key, never stored or logged.
+- Full policy at [`thetax.nl/mcp/privacy.html`](https://thetax.nl/mcp/privacy.html).
 
 ## Development
 
@@ -114,6 +115,7 @@ src/
   index.ts          Worker fetch handler: per-IP rate limit + createMcpHandler(createServer)
   server.ts          createServer() factory — registers the 3 tools and the tax://brackets/{year} resource
   setup-page.ts       Renders the /mcp/setup.html instructions page
+  privacy-page.ts     Renders the /mcp/privacy.html privacy policy
   env.ts             Env (RATE_LIMITER binding) type
   tax/
     schemas.ts        Zod v4 input schemas
