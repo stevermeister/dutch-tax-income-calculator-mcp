@@ -4,6 +4,12 @@
       <stop offset="0%" stop-color="#1d4ed8" />
       <stop offset="100%" stop-color="#0ea5a6" />
     </linearGradient>
+    <!-- thetax.nl's own favicon checkmark: light cyan-blue at the base, deep navy at the tip -->
+    <linearGradient id="check" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4fc3f7" />
+      <stop offset="55%" stop-color="#2f7cd6" />
+      <stop offset="100%" stop-color="#2c3e7c" />
+    </linearGradient>
   </defs>
 
   <rect width="512" height="512" rx="112" fill="url(#bg)" />
@@ -18,9 +24,10 @@
     <rect x="140" y="284" width="180" height="34" rx="17" fill="#ffffff" />
   </g>
 
-  <!-- Verified badge, bottom right -->
-  <circle cx="378" cy="378" r="76" fill="#10b981" stroke="#0ea5a6" stroke-width="6" />
-  <path d="M 346 380 L 368 402 L 414 354"
-        fill="none" stroke="#ffffff" stroke-width="20"
+  <!-- Checkmark badge, matching thetax.nl's existing favicon: short lower-left arm,
+       long steep upper-right arm, gradient from light cyan-blue to navy -->
+  <circle cx="378" cy="378" r="80" fill="#ffffff" />
+  <path d="M 337 378 L 366 407 L 425 332"
+        fill="none" stroke="url(#check)" stroke-width="22"
         stroke-linecap="round" stroke-linejoin="round" />
 </svg>
