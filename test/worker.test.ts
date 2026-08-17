@@ -68,6 +68,21 @@ describe("worker HTTP surface", () => {
     expect(setupHtml).toContain("https://example.com/mcp/privacy.html");
   });
 
+  it("serves the terms of service at /mcp/terms.html, linked from setup and privacy pages", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/terms.html");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    const html = await res.text();
+    expect(html.toLowerCase()).toContain("terms of service");
+    expect(html).toContain("Not tax advice");
+    expect(html).toContain("No warranty");
+
+    const setupHtml = await (await SELF.fetch("https://example.com/mcp/setup.html")).text();
+    expect(setupHtml).toContain("https://example.com/mcp/terms.html");
+    const privacyHtml = await (await SELF.fetch("https://example.com/mcp/privacy.html")).text();
+    expect(privacyHtml).toContain("https://example.com/mcp/terms.html");
+  });
+
   it("serves the icon at /mcp/icon.png, referenced as a favicon on both pages", async () => {
     const res = await SELF.fetch("https://example.com/mcp/icon.png");
     expect(res.status).toBe(200);

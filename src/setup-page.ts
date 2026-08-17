@@ -267,7 +267,8 @@ export function renderSetupPage(mcpUrl: string): string {
   </details>
 
   <footer>No request bodies, tool arguments, or calculated amounts are ever logged. ·
-    <a href="${new URL(mcpUrl).origin}/mcp/privacy.html" rel="noopener">Privacy Policy</a></footer>
+    <a href="${new URL(mcpUrl).origin}/mcp/privacy.html" rel="noopener">Privacy Policy</a> ·
+    <a href="${new URL(mcpUrl).origin}/mcp/terms.html" rel="noopener">Terms of Service</a></footer>
 </main>
 </body>
 </html>

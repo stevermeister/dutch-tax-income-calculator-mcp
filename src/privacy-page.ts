@@ -89,7 +89,8 @@ export function renderPrivacyPage(mcpUrl: string): string {
 
   <h2>Contact</h2>
   <p>Questions or concerns about this policy: open an issue at
-  <a href="${REPO_ISSUES_URL}" rel="noopener">${REPO_ISSUES_URL}</a>.</p>
+  <a href="${REPO_ISSUES_URL}" rel="noopener">${REPO_ISSUES_URL}</a>. See also the
+  <a href="${new URL(mcpUrl).origin}/mcp/terms.html" rel="noopener">Terms of Service</a>.</p>
 </main>
 </body>
 </html>

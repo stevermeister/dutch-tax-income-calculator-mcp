@@ -3,6 +3,7 @@ import { createMcpHandler } from "agents/mcp/server";
 import { createServer } from "./server";
 import { renderSetupPage } from "./setup-page";
 import { renderPrivacyPage } from "./privacy-page";
+import { renderTermsPage } from "./terms-page";
 import { ICON_PNG_BASE64 } from "./icon";
 import type { Env } from "./env";
 
@@ -15,6 +16,7 @@ const MCP_ROUTE = "/mcp";
 const SETUP_ROUTE = "/mcp/setup.html";
 const LEGACY_SETUP_ROUTE = "/mcp/setup";
 const PRIVACY_ROUTE = "/mcp/privacy.html";
+const TERMS_ROUTE = "/mcp/terms.html";
 const ICON_ROUTE = "/mcp/icon.png";
 
 function base64ToBytes(b64: string): Uint8Array {
@@ -87,6 +89,12 @@ export default {
 
     if (url.pathname === PRIVACY_ROUTE) {
       return new Response(renderPrivacyPage(`${url.origin}${MCP_ROUTE}`), {
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+
+    if (url.pathname === TERMS_ROUTE) {
+      return new Response(renderTermsPage(`${url.origin}${MCP_ROUTE}`), {
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     }
