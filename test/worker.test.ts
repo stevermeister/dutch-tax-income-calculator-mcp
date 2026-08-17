@@ -36,51 +36,69 @@ describe("worker HTTP surface", () => {
     expect(text.toLowerCase()).toContain("not tax advice");
   });
 
-  it("serves the setup instructions page at /mcp/setup.html", async () => {
-    const res = await SELF.fetch("https://example.com/mcp/setup.html");
+  it("serves the docs page at /docs", async () => {
+    const res = await SELF.fetch("https://example.com/docs");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const html = await res.text();
     expect(html).toContain("https://example.com/mcp");
     expect(html).toContain("mcp-remote");
-    expect(html).toContain("claude_desktop_config.json");
     expect(html.toLowerCase()).toContain("not tax advice");
     expect(html).toContain("Connectors");
+    expect(html).toContain("read-only and require no authentication");
+    // Full input schemas for all three tools, auto-generated from the live zod schemas
+    expect(html).toContain("calculate_net_salary");
+    expect(html).toContain("calculate_gross_from_net");
+    expect(html).toContain("compare_scenarios");
+    expect(html).toContain("additionalProperties");
+    expect(html).toContain("targetNet");
   });
 
-  it("redirects the old extension-less /mcp/setup to /mcp/setup.html", async () => {
-    const res = await SELF.fetch("https://example.com/mcp/setup", { redirect: "manual" });
-    expect(res.status).toBe(302);
-    expect(res.headers.get("location")).toBe("https://example.com/mcp/setup.html");
-  });
-
-  it("serves the privacy policy at /mcp/privacy.html, linked from the setup page", async () => {
-    const res = await SELF.fetch("https://example.com/mcp/privacy.html");
+  it("serves the privacy policy at /privacy, linked from the docs page", async () => {
+    const res = await SELF.fetch("https://example.com/privacy");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const html = await res.text();
     expect(html.toLowerCase()).toContain("privacy policy");
     expect(html).toContain("Data collection");
     expect(html).toContain("Data retention");
-    expect(html).toContain("Contact");
+    expect(html).toContain("Cookies");
+    expect(html).toContain("Edviso BV");
+    expect(html).toContain("stevermeister@gmail.com");
 
-    const setupHtml = await (await SELF.fetch("https://example.com/mcp/setup.html")).text();
-    expect(setupHtml).toContain("https://example.com/mcp/privacy.html");
+    const docsHtml = await (await SELF.fetch("https://example.com/docs")).text();
+    expect(docsHtml).toContain("https://example.com/privacy");
   });
 
-  it("serves the terms of service at /mcp/terms.html, linked from setup and privacy pages", async () => {
-    const res = await SELF.fetch("https://example.com/mcp/terms.html");
+  it("serves the terms of service at /terms, linked from docs and privacy pages", async () => {
+    const res = await SELF.fetch("https://example.com/terms");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const html = await res.text();
     expect(html.toLowerCase()).toContain("terms of service");
     expect(html).toContain("Not tax advice");
     expect(html).toContain("No warranty");
+    expect(html).toContain("Edviso BV");
+    expect(html).toContain("Netherlands");
 
-    const setupHtml = await (await SELF.fetch("https://example.com/mcp/setup.html")).text();
-    expect(setupHtml).toContain("https://example.com/mcp/terms.html");
-    const privacyHtml = await (await SELF.fetch("https://example.com/mcp/privacy.html")).text();
-    expect(privacyHtml).toContain("https://example.com/mcp/terms.html");
+    const docsHtml = await (await SELF.fetch("https://example.com/docs")).text();
+    expect(docsHtml).toContain("https://example.com/terms");
+    const privacyHtml = await (await SELF.fetch("https://example.com/privacy")).text();
+    expect(privacyHtml).toContain("https://example.com/terms");
+  });
+
+  it("redirects the old /mcp/setup(.html), /mcp/privacy.html and /mcp/terms.html paths", async () => {
+    const cases: Array<[string, string]> = [
+      ["/mcp/setup", "/docs"],
+      ["/mcp/setup.html", "/docs"],
+      ["/mcp/privacy.html", "/privacy"],
+      ["/mcp/terms.html", "/terms"],
+    ];
+    for (const [from, to] of cases) {
+      const res = await SELF.fetch(`https://example.com${from}`, { redirect: "manual" });
+      expect(res.status).toBe(302);
+      expect(res.headers.get("location")).toBe(`https://example.com${to}`);
+    }
   });
 
   it("serves the icon at /mcp/icon.png, referenced as a favicon on both pages", async () => {
@@ -92,20 +110,25 @@ describe("worker HTTP surface", () => {
     // PNG magic number
     expect([bytes[0], bytes[1], bytes[2], bytes[3]]).toEqual([0x89, 0x50, 0x4e, 0x47]);
 
-    const setupHtml = await (await SELF.fetch("https://example.com/mcp/setup.html")).text();
-    expect(setupHtml).toContain("https://example.com/mcp/icon.png");
-    const privacyHtml = await (await SELF.fetch("https://example.com/mcp/privacy.html")).text();
+    const docsHtml = await (await SELF.fetch("https://example.com/docs")).text();
+    expect(docsHtml).toContain("https://example.com/mcp/icon.png");
+    const privacyHtml = await (await SELF.fetch("https://example.com/privacy")).text();
     expect(privacyHtml).toContain("https://example.com/mcp/icon.png");
   });
 
-  it("redirects a browser landing on /mcp (or /mcp/) to the setup page", async () => {
+  it("returns 404 at the OpenAI domain-verification challenge path while the token is unset", async () => {
+    const res = await SELF.fetch("https://example.com/.well-known/openai-apps-challenge");
+    expect(res.status).toBe(404);
+  });
+
+  it("redirects a browser landing on /mcp (or /mcp/) to the docs page", async () => {
     for (const path of ["/mcp", "/mcp/"]) {
       const res = await SELF.fetch(`https://example.com${path}`, {
         redirect: "manual",
         headers: { accept: "text/html,application/xhtml+xml" },
       });
       expect(res.status).toBe(302);
-      expect(res.headers.get("location")).toBe("https://example.com/mcp/setup.html");
+      expect(res.headers.get("location")).toBe("https://example.com/docs");
     }
   });
 
@@ -149,6 +172,7 @@ describe("worker HTTP surface", () => {
       expect(tool.description.toLowerCase()).toContain("not tax advice");
       expect(tool.title).toBeTruthy();
       expect(tool.annotations?.readOnlyHint).toBe(true);
+      expect(tool.annotations?.destructiveHint).toBe(false);
     }
   });
 

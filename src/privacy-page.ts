@@ -1,13 +1,17 @@
-const REPO_ISSUES_URL = "https://github.com/stevermeister/dutch-tax-income-calculator-mcp/issues";
+const CONTROLLER = "Edviso BV";
+const CONTACT_EMAIL = "stevermeister@gmail.com";
+const LAST_UPDATED = "17 August 2026";
 
 export function renderPrivacyPage(mcpUrl: string): string {
+  const origin = new URL(mcpUrl).origin;
+
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Privacy Policy — Dutch Tax Income Calculator MCP server</title>
-<link rel="icon" type="image/png" href="${new URL(mcpUrl).origin}/mcp/icon.png" />
+<link rel="icon" type="image/png" href="${origin}/mcp/icon.png" />
 <style>
   :root {
     color-scheme: light dark;
@@ -55,28 +59,32 @@ export function renderPrivacyPage(mcpUrl: string): string {
 <body>
 <main>
   <h1>Privacy Policy</h1>
-  <p class="updated">Dutch Tax Income Calculator MCP server (<code>${mcpUrl}</code>)</p>
+  <p class="updated">Dutch Tax Income Calculator MCP server (<code>${mcpUrl}</code>) · Controller: ${CONTROLLER}
+  · Last updated: ${LAST_UPDATED}</p>
 
   <div class="summary">
-    <p><strong>In short:</strong> this server has no user accounts, no authentication, and no database. It
-    computes a tax result from the numbers you provide and returns it — nothing about that request is stored
-    or logged.</p>
+    <p><strong>In short:</strong> this server has no user accounts, no cookies, and no database. It computes
+    a tax result from the numbers you provide and returns it — nothing about that request is stored or
+    logged.</p>
   </div>
 
   <h2>Data collection</h2>
   <p>The server accepts calculation inputs (income figures, tax year, and similar parameters) with each tool
-  call. These values are used only to compute the response for that single request. No account, sign-in, or
-  personal identifier is required or requested.</p>
+  call. These values are used only to compute the response for that single request. No account, sign-in,
+  cookie, or personal identifier is required, requested, or set.</p>
 
   <h2>Usage and storage</h2>
-  <p>Tool arguments, calculated results, and request bodies are never written to a log, database, or file.
-  There is nothing to retrieve later because nothing is kept — the code path that would log this data doesn't
-  exist. Your client's IP address is used only as a transient key for a rate limiter (60 requests per minute
-  per client), through a Cloudflare-managed counter; it is not stored beyond that rolling window and is never
-  associated with request content.</p>
+  <p>Salary inputs, tool arguments, calculated results, and request bodies are never written to a log,
+  database, or file. There is nothing to retrieve later because nothing is kept — the code path that would log
+  this data doesn't exist. Your client's IP address is used only as a transient key for a rate limiter (60
+  requests per minute per client), through a Cloudflare-managed counter; it is not stored beyond that rolling
+  window and is never associated with request content.</p>
   <p>The hosting platform (Cloudflare) may capture standard, low-level operational metrics for reliability and
   abuse prevention — request counts, status codes, latency — the same as any web service running on its
   infrastructure. This is platform-level and does not include tool arguments or calculated values.</p>
+
+  <h2>Cookies</h2>
+  <p>None. This server sets no cookies and uses no browser or client-side storage.</p>
 
   <h2>Third-party sharing</h2>
   <p>None. This server doesn't call any third-party API and doesn't send request data anywhere except back to
@@ -88,9 +96,9 @@ export function renderPrivacyPage(mcpUrl: string): string {
   <p>None. There is no data store, so there is nothing to retain or delete.</p>
 
   <h2>Contact</h2>
-  <p>Questions or concerns about this policy: open an issue at
-  <a href="${REPO_ISSUES_URL}" rel="noopener">${REPO_ISSUES_URL}</a>. See also the
-  <a href="${new URL(mcpUrl).origin}/mcp/terms.html" rel="noopener">Terms of Service</a>.</p>
+  <p>Controller: ${CONTROLLER}. Questions or concerns about this policy:
+  <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>. See also the
+  <a href="${origin}/terms" rel="noopener">Terms of Service</a>.</p>
 </main>
 </body>
 </html>

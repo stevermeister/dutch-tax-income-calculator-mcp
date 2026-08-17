@@ -19,6 +19,7 @@ const NOT_TAX_ADVICE = "Indicative only — not tax advice.";
 // output, and no interaction with an open/unpredictable external world.
 const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
+  destructiveHint: false,
   idempotentHint: true,
   openWorldHint: false,
 } as const;

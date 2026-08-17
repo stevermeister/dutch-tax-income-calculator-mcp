@@ -7,10 +7,18 @@
   "observability": {
     "enabled": true
   },
-  // Path-scoped route, not a Custom Domain: thetax.nl's apex is already live
-  // (served via Netlify through Cloudflare DNS). This only claims /mcp* on
-  // the domain — everything else keeps going to Netlify untouched.
-  "routes": ["thetax.nl/mcp*"],
+  // Path-scoped routes, not a Custom Domain: thetax.nl's apex is already live
+  // (served via Netlify through Cloudflare DNS). These only claim the exact
+  // paths below — everything else keeps going to Netlify untouched. Each
+  // extra top-level path (docs/privacy/terms/well-known challenge) needs its
+  // own explicit route entry; a wildcard here would only match nested paths.
+  "routes": [
+    "thetax.nl/mcp*",
+    "thetax.nl/docs",
+    "thetax.nl/privacy",
+    "thetax.nl/terms",
+    "thetax.nl/.well-known/openai-apps-challenge"
+  ],
   // 60 requests/minute per client IP. Cloudflare-managed counter — no Durable
   // Object of our own, keeps the handler stateless.
   "ratelimits": [

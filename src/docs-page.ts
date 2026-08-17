@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   DEVELOPER_MODE,
   PLUGINS_TAB,
@@ -10,10 +12,35 @@ import {
   ADD_CUSTOM_CONNECTOR_FORM,
   CONNECT_CONFIRM as CLAUDE_CONNECT_CONFIRM,
 } from "./claude-screenshots";
+import {
+  CalculateNetSalaryInput,
+  CalculateGrossFromNetInput,
+  CompareScenariosInput,
+} from "./tax/schemas";
 
 const REPO_URL = "https://github.com/stevermeister/dutch-tax-income-calculator-mcp";
+const SUPPORT_EMAIL = "stevermeister@gmail.com";
 
-export function renderSetupPage(mcpUrl: string): string {
+const OUTPUT_SHAPE_COMMON = `{
+  "normalizedInput": { /* the validated input, with defaults filled in */ },
+  "result": { /* full computed paycheck: grossYear, netYear, netMonth, incomeTax, ... */ },
+  "breakdown": [
+    { "label": "Payroll tax (loonbelasting)", "amountYear": -2916, "amountMonth": -243 },
+    { "label": "Social security contributions (volksverzekeringen)", "amountYear": -9954, "amountMonth": -829.5 },
+    { "label": "General tax credit (algemene heffingskorting)", "amountYear": 2714.29, "amountMonth": 226.19 },
+    { "label": "Labour tax credit (arbeidskorting)", "amountYear": 5498.04, "amountMonth": 458.17 }
+  ],
+  "assumptions": [ "This result is indicative only and is not tax advice ...", "..." ],
+  "permalink": "https://thetax.nl/?year=2026&startFrom=Year&salary=36000&..."
+}`;
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[ch] as string);
+}
+
+export function renderDocsPage(mcpUrl: string): string {
+  const origin = new URL(mcpUrl).origin;
+
   const claudeDesktopConfig = JSON.stringify(
     {
       mcpServers: {
@@ -28,25 +55,22 @@ export function renderSetupPage(mcpUrl: string): string {
   );
 
   const mcpJsonConfig = JSON.stringify(
-    {
-      servers: {
-        "dutch-tax-income-calculator": {
-          type: "http",
-          url: mcpUrl,
-        },
-      },
-    },
+    { servers: { "dutch-tax-income-calculator": { type: "http", url: mcpUrl } } },
     null,
     2
   );
+
+  const netSalarySchema = JSON.stringify(z.toJSONSchema(CalculateNetSalaryInput), null, 2);
+  const grossFromNetSchema = JSON.stringify(z.toJSONSchema(CalculateGrossFromNetInput), null, 2);
+  const compareScenariosSchema = JSON.stringify(z.toJSONSchema(CompareScenariosInput), null, 2);
 
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Connect the Dutch Tax Calculator to Claude or ChatGPT</title>
-<link rel="icon" type="image/png" href="${new URL(mcpUrl).origin}/mcp/icon.png" />
+<title>Dutch Tax Income Calculator — Documentation</title>
+<link rel="icon" type="image/png" href="${origin}/mcp/icon.png" />
 <style>
   :root {
     color-scheme: light dark;
@@ -84,13 +108,10 @@ export function renderSetupPage(mcpUrl: string): string {
     color: var(--fg);
     font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
-  main {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 48px 20px 80px;
-  }
+  main { max-width: 780px; margin: 0 auto; padding: 48px 20px 80px; }
   h1 { font-size: 1.7rem; margin-bottom: 0.3em; }
-  h2 { font-size: 1.3rem; margin: 0 0 0.2em; }
+  h2 { font-size: 1.3rem; margin: 2em 0 0.2em; }
+  h3 { font-size: 1.05rem; margin: 1.6em 0 0.3em; }
   p { color: var(--muted); }
   .lede { font-size: 1.05rem; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
@@ -122,7 +143,7 @@ export function renderSetupPage(mcpUrl: string): string {
     margin: 28px 0;
     background: var(--card);
   }
-  .app-card h2 { display: flex; align-items: center; gap: 10px; }
+  .app-card h2 { display: flex; align-items: center; gap: 10px; margin-top: 0; }
   .badge {
     font-size: 0.7rem;
     text-transform: uppercase;
@@ -159,20 +180,20 @@ export function renderSetupPage(mcpUrl: string): string {
   }
   a { color: var(--accent); }
   details {
-    margin-top: 3em;
+    margin-top: 1.4em;
     border-top: 1px solid var(--border);
     padding-top: 1.2em;
   }
   summary { cursor: pointer; font-weight: 600; color: var(--fg); }
-  details pre {
+  pre {
     background: var(--code-bg);
     color: var(--code-fg);
     border-radius: 8px;
     padding: 16px;
     overflow-x: auto;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     line-height: 1.5;
-    margin-top: 1em;
+    margin-top: 0.8em;
   }
   footer { margin-top: 2em; color: var(--muted); font-size: 0.85rem; }
 </style>
@@ -180,22 +201,25 @@ export function renderSetupPage(mcpUrl: string): string {
 <body>
 <main>
   <h1>Dutch Tax Income Calculator</h1>
-  <p class="lede">Ask Claude or ChatGPT a question about Dutch salary, tax, or take-home pay, and get a real
-  answer computed from the official brackets — no spreadsheet, no manually looking up rates. Setup takes about
-  two minutes.</p>
+  <p class="lede">A remote MCP server that calculates Dutch net/gross salary, compares scenarios, and looks up
+  official tax brackets, so an AI assistant can answer real salary and tax questions instead of guessing.
+  Every calculation is delegated to the open-source
+  <a href="https://www.npmjs.com/package/dutch-tax-income-calculator" rel="noopener">dutch-tax-income-calculator</a>
+  package — this server never reimplements tax logic or tax tables itself.</p>
 
   <div class="warn">Indicative only — not tax advice. Confirm with a qualified Dutch tax advisor or the
   Belastingdienst before acting on any number this returns.</div>
 
-  <p><strong>Server address</strong> — you'll paste this into Claude or ChatGPT below:</p>
+  <p><strong>Server address</strong> — paste this into Claude or ChatGPT below:</p>
   <div class="url-box">${mcpUrl}</div>
+  <p>All three tools are <strong>read-only and require no authentication</strong> — nothing is written,
+  changed, or deleted, and there's no sign-in step.</p>
 
-  <p style="margin-top:28px;"><strong>Once connected, just ask things like:</strong></p>
+  <p style="margin-top:28px;"><strong>Example prompts, once connected:</strong></p>
   <ul class="prompts">
     <li>"What's my net salary if I earn €65,000 gross in 2026?"</li>
     <li>"How much do I need to earn gross to take home €3,500 a month?"</li>
     <li>"Compare my take-home pay at €50k vs €60k gross, with and without the 30% ruling"</li>
-    <li>"What are the 2026 Dutch payroll tax brackets?"</li>
   </ul>
 
   <section class="app-card">
@@ -244,7 +268,7 @@ export function renderSetupPage(mcpUrl: string): string {
     </ol>
   </section>
 
-  <h2 style="margin-top:2.5em;">What it can do</h2>
+  <h2>What it can do</h2>
   <ul class="features">
     <li>Calculate net salary from gross income, for any supported tax year</li>
     <li>Work backwards from a target net salary to find the matching gross</li>
@@ -252,29 +276,72 @@ export function renderSetupPage(mcpUrl: string): string {
     <li>Look up the official payroll tax, social security, and credit brackets for a given year</li>
   </ul>
 
-  <details>
-    <summary>For developers</summary>
-    <p>Streamable HTTP MCP transport, no authentication, rate-limited to 60 requests/minute per client.</p>
+  <h2>Tax year data</h2>
+  <p>Every tool takes a <code>year</code> parameter. Supported years are exactly the years present in the
+  <code>dutch-tax-income-calculator</code> package's bundled <code>data.json</code> — nothing is extrapolated
+  or assumed for years outside that set. Passing an unsupported year returns a clear error listing which years
+  are currently supported, never a silent fallback to the nearest year. The full bracket data for a given year
+  is also readable directly as the <code>tax://brackets/{year}</code> MCP resource.</p>
 
+  <h2>Tools: input and output</h2>
+
+  <h3><code>calculate_net_salary</code></h3>
+  <p>Gross → net for a given tax year. Input schema:</p>
+  <pre>${escapeHtml(netSalarySchema)}</pre>
+  <p>Output shape (<code>content[0].text</code>, JSON-encoded):</p>
+  <pre>${escapeHtml(OUTPUT_SHAPE_COMMON)}</pre>
+
+  <h3><code>calculate_gross_from_net</code></h3>
+  <p>Net → gross. Input schema:</p>
+  <pre>${escapeHtml(grossFromNetSchema)}</pre>
+  <p>Output shape is the same as <code>calculate_net_salary</code>, except when rounding makes the gross
+  non-unique or no gross produces the target net — see below.</p>
+  <pre>{
+  "normalizedInput": { /* ... */ },
+  "result": { "plateau": true, "grossLow": 35999.5, "grossHigh": 36000.49 },
+  "breakdown": [ /* computed at grossHigh */ ],
+  "assumptions": [ "...", "Rounding to 2 decimals means more than one gross value produces this net income; ..." ],
+  "permalink": "https://thetax.nl/?..."
+}</pre>
+  <p>If no gross produces the target net at all, the tool returns <code>isError: true</code> with the
+  package's own error message verbatim (e.g. naming the nearest achievable net) — never a generic error.</p>
+
+  <h3><code>compare_scenarios</code></h3>
+  <p>2–5 scenarios, each shaped like <code>calculate_net_salary</code>'s input plus an optional
+  <code>label</code>. Input schema:</p>
+  <pre>${escapeHtml(compareScenariosSchema)}</pre>
+  <pre>{
+  "assumptions": [ "This result is indicative only and is not tax advice ..." ],
+  "scenarios": [
+    { "index": 1, "label": "Current", "normalizedInput": { /* ... */ }, "result": { /* ... */ }, "breakdown": [ /* ... */ ], "assumptions": [ /* ... */ ], "permalink": "..." },
+    { "index": 2, "label": "After raise", "...": "..." }
+  ],
+  "comparisonTable": "| # | Label | Year | Gross/yr | Net/yr | Net/mo | Income tax | Effective tax rate |\\n|---|---|---|---|---|---|---|---|\\n| 1 | Current | 2026 | ... |"
+}</pre>
+
+  <details>
+    <summary>Manual client config (VS Code, Cursor, raw MCP clients)</summary>
     <p><code>claude_desktop_config.json</code> (manual config via the
     <a href="https://www.npmjs.com/package/mcp-remote" rel="noopener">mcp-remote</a> bridge):</p>
     <pre>${escapeHtml(claudeDesktopConfig)}</pre>
-
     <p><code>mcp.json</code> (VS Code, Cursor, and other clients supporting the standard config format):</p>
     <pre>${escapeHtml(mcpJsonConfig)}</pre>
-
-    <p>Source and README: <a href="${REPO_URL}" rel="noopener">${REPO_URL}</a></p>
   </details>
 
-  <footer>No request bodies, tool arguments, or calculated amounts are ever logged. ·
-    <a href="${new URL(mcpUrl).origin}/mcp/privacy.html" rel="noopener">Privacy Policy</a> ·
-    <a href="${new URL(mcpUrl).origin}/mcp/terms.html" rel="noopener">Terms of Service</a></footer>
+  <h2>Rate limits and privacy</h2>
+  <p>60 requests/minute per client, no authentication. No request bodies, tool arguments, or calculated
+  amounts are ever logged — see the <a href="${origin}/privacy" rel="noopener">Privacy Policy</a> for details.</p>
+
+  <h2>Support</h2>
+  <p>Source and issue tracker: <a href="${REPO_URL}" rel="noopener">${REPO_URL}</a>. Contact:
+  <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>.</p>
+
+  <footer>
+    <a href="${origin}/privacy" rel="noopener">Privacy Policy</a> ·
+    <a href="${origin}/terms" rel="noopener">Terms of Service</a>
+  </footer>
 </main>
 </body>
 </html>
 `;
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[ch] as string);
 }
