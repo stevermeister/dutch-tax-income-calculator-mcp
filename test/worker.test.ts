@@ -54,6 +54,14 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("claude mcp add --transport http dutch-tax-income-calculator https://example.com/mcp");
     expect(html).toContain("mcp_servers.dutch-tax-income-calculator");
     expect(html).toContain("navigator.clipboard.writeText");
+    // Quick-jump nav: every anchor target it links to must actually exist on the page
+    const navMatch = html.match(/<nav class="toc"[^>]*>([\s\S]*?)<\/nav>/);
+    expect(navMatch).toBeTruthy();
+    const hrefs = [...navMatch![1].matchAll(/href="#([\w-]+)"/g)].map((m) => m[1]);
+    expect(hrefs.length).toBeGreaterThanOrEqual(8);
+    for (const id of hrefs) {
+      expect(html).toContain(`id="${id}"`);
+    }
     expect(html).toContain("additionalProperties");
     expect(html).toContain("targetNet");
   });

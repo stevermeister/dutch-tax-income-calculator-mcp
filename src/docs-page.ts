@@ -187,6 +187,28 @@ export function renderDocsPage(mcpUrl: string): string {
     font-size: 0.95rem;
   }
   a { color: var(--accent); }
+  h2, h3 { scroll-margin-top: 20px; }
+  nav.toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0 8px;
+    padding: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  nav.toc a {
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px;
+  }
+  nav.toc a:hover { border-color: var(--accent); color: var(--accent); }
   .copy-box {
     display: flex;
     align-items: flex-start;
@@ -245,6 +267,18 @@ export function renderDocsPage(mcpUrl: string): string {
   <a href="https://www.npmjs.com/package/dutch-tax-income-calculator" rel="noopener">dutch-tax-income-calculator</a>
   package — this server never reimplements tax logic or tax tables itself.</p>
 
+  <nav class="toc" aria-label="Quick jump">
+    <a href="#claude">Claude</a>
+    <a href="#chatgpt">ChatGPT</a>
+    <a href="#cli">Claude Code / Codex</a>
+    <a href="#features">What it can do</a>
+    <a href="#tax-year">Tax year data</a>
+    <a href="#tools">Tools</a>
+    <a href="#manual-config">Manual config</a>
+    <a href="#rate-limits">Rate limits</a>
+    <a href="#support">Support</a>
+  </nav>
+
   <div class="warn">Indicative only — not tax advice. Confirm with a qualified Dutch tax advisor or the
   Belastingdienst before acting on any number this returns.</div>
 
@@ -261,7 +295,7 @@ export function renderDocsPage(mcpUrl: string): string {
   </ul>
 
   <section class="app-card">
-    <h2>Claude <span class="badge">Claude.ai &amp; Claude Desktop</span></h2>
+    <h2 id="claude">Claude <span class="badge">Claude.ai &amp; Claude Desktop</span></h2>
     <ol class="steps">
       <li>Open <strong>Settings → Connectors</strong>, click <strong>Add</strong> (top right), then
         <strong>Add custom connector</strong>.
@@ -280,7 +314,7 @@ export function renderDocsPage(mcpUrl: string): string {
   </section>
 
   <section class="app-card">
-    <h2>ChatGPT <span class="badge">Web, Developer mode required</span></h2>
+    <h2 id="chatgpt">ChatGPT <span class="badge">Web, Developer mode required</span></h2>
     <ol class="steps">
       <li>Go to <strong>Settings → Security and login</strong> and turn on <strong>Developer mode</strong>
         (only needs to be done once). ChatGPT will flag it as elevated risk — that's expected, it's what
@@ -307,7 +341,7 @@ export function renderDocsPage(mcpUrl: string): string {
   </section>
 
   <section class="app-card">
-    <h2>Claude Code &amp; Codex CLI <span class="badge">Terminal</span></h2>
+    <h2 id="cli">Claude Code &amp; Codex CLI <span class="badge">Terminal</span></h2>
     <p>These are coding agents with shell/file access, so instead of clicking through settings, just hand
     them the command or prompt below and let them do it.</p>
 
@@ -327,7 +361,7 @@ export function renderDocsPage(mcpUrl: string): string {
     </div>
   </section>
 
-  <h2>What it can do</h2>
+  <h2 id="features">What it can do</h2>
   <ul class="features">
     <li>Calculate net salary from gross income, for any supported tax year</li>
     <li>Work backwards from a target net salary to find the matching gross</li>
@@ -335,14 +369,14 @@ export function renderDocsPage(mcpUrl: string): string {
     <li>Look up the official payroll tax, social security, and credit brackets for a given year</li>
   </ul>
 
-  <h2>Tax year data</h2>
+  <h2 id="tax-year">Tax year data</h2>
   <p>Every tool takes a <code>year</code> parameter. Supported years are exactly the years present in the
   <code>dutch-tax-income-calculator</code> package's bundled <code>data.json</code> — nothing is extrapolated
   or assumed for years outside that set. Passing an unsupported year returns a clear error listing which years
   are currently supported, never a silent fallback to the nearest year. The full bracket data for a given year
   is also readable directly as the <code>tax://brackets/{year}</code> MCP resource.</p>
 
-  <h2>Tools: input and output</h2>
+  <h2 id="tools">Tools: input and output</h2>
 
   <h3><code>calculate_net_salary</code></h3>
   <p>Gross → net for a given tax year. Input schema:</p>
@@ -378,7 +412,7 @@ export function renderDocsPage(mcpUrl: string): string {
   "comparisonTable": "| # | Label | Year | Gross/yr | Net/yr | Net/mo | Income tax | Effective tax rate |\\n|---|---|---|---|---|---|---|---|\\n| 1 | Current | 2026 | ... |"
 }</pre>
 
-  <details>
+  <details id="manual-config">
     <summary>Manual client config (VS Code, Cursor, raw MCP clients)</summary>
     <p><code>claude_desktop_config.json</code> (manual config via the
     <a href="https://www.npmjs.com/package/mcp-remote" rel="noopener">mcp-remote</a> bridge):</p>
@@ -387,11 +421,11 @@ export function renderDocsPage(mcpUrl: string): string {
     <pre>${escapeHtml(mcpJsonConfig)}</pre>
   </details>
 
-  <h2>Rate limits and privacy</h2>
+  <h2 id="rate-limits">Rate limits and privacy</h2>
   <p>60 requests/minute per client, no authentication. No request bodies, tool arguments, or calculated
   amounts are ever logged — see the <a href="${origin}/privacy" rel="noopener">Privacy Policy</a> for details.</p>
 
-  <h2>Support</h2>
+  <h2 id="support">Support</h2>
   <p>Source and issue tracker: <a href="${REPO_URL}" rel="noopener">${REPO_URL}</a>. Contact:
   <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>.</p>
 
