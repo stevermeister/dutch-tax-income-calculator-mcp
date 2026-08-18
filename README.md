@@ -103,6 +103,31 @@ bridge. Add this to `claude_desktop_config.json`:
 }
 ```
 
+### Claude Code
+
+A real CLI command — run it directly in your terminal:
+
+```bash
+claude mcp add --transport http dutch-tax-income-calculator https://thetax.nl/mcp
+```
+
+### Codex CLI
+
+Codex's CLI only has a one-liner for local (stdio) servers; a remote HTTP server like this one needs a
+`config.toml` edit instead. Since Codex is itself an agent with file access, the easiest path is to paste this
+prompt into Codex chat and let it make the edit:
+
+> Add a remote MCP server to my Codex CLI config. Edit `~/.codex/config.toml` (or `./.codex/config.toml` for
+> this project only) and add:
+>
+> ```toml
+> [mcp_servers.dutch-tax-income-calculator]
+> url = "https://thetax.nl/mcp"
+> ```
+>
+> No authentication is needed, so no `bearer_token_env_var` or `http_headers` are required. Then confirm the
+> entry was added correctly.
+
 Deployed at `thetax.nl/mcp` (path-scoped routes on the existing `thetax.nl` zone, not a custom domain — the
 rest of the site is unaffected). A human-readable documentation page with these same instructions, plus the
 full input/output schema for every tool, is served at [`thetax.nl/docs`](https://thetax.nl/docs). If you
