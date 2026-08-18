@@ -64,6 +64,14 @@ export function renderDocsPage(mcpUrl: string): string {
   const grossFromNetSchema = JSON.stringify(z.toJSONSchema(CalculateGrossFromNetInput), null, 2);
   const compareScenariosSchema = JSON.stringify(z.toJSONSchema(CompareScenariosInput), null, 2);
 
+  const claudeCodeCommand = `claude mcp add --transport http dutch-tax-income-calculator ${mcpUrl}`;
+  const codexPrompt =
+    `Add a remote MCP server to my Codex CLI config. Edit ~/.codex/config.toml ` +
+    `(or ./.codex/config.toml for this project only) and add:\n\n` +
+    `[mcp_servers.dutch-tax-income-calculator]\nurl = "${mcpUrl}"\n\n` +
+    `No authentication is needed, so no bearer_token_env_var or http_headers are required. ` +
+    `Then confirm the entry was added correctly.`;
+
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -179,6 +187,36 @@ export function renderDocsPage(mcpUrl: string): string {
     font-size: 0.95rem;
   }
   a { color: var(--accent); }
+  .copy-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 10px 0 4px;
+  }
+  .copy-box code {
+    flex: 1;
+    color: var(--code-fg);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .copy-btn {
+    flex-shrink: 0;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .copy-btn:hover { opacity: 0.9; }
   details {
     margin-top: 1.4em;
     border-top: 1px solid var(--border);
@@ -268,6 +306,27 @@ export function renderDocsPage(mcpUrl: string): string {
     </ol>
   </section>
 
+  <section class="app-card">
+    <h2>Claude Code &amp; Codex CLI <span class="badge">Terminal</span></h2>
+    <p>These are coding agents with shell/file access, so instead of clicking through settings, just hand
+    them the command or prompt below and let them do it.</p>
+
+    <h3>Claude Code</h3>
+    <p>A real CLI command — run it directly in your terminal:</p>
+    <div class="copy-box">
+      <code id="claude-code-cmd">${escapeHtml(claudeCodeCommand)}</code>
+      <button class="copy-btn" type="button" data-copy-target="claude-code-cmd">Copy</button>
+    </div>
+
+    <h3>Codex CLI</h3>
+    <p>Codex's CLI only has a one-liner for local (stdio) servers; for a remote HTTP server like this one it
+    needs a <code>config.toml</code> edit. Paste this into Codex chat and let it make the edit:</p>
+    <div class="copy-box">
+      <code id="codex-prompt">${escapeHtml(codexPrompt)}</code>
+      <button class="copy-btn" type="button" data-copy-target="codex-prompt">Copy</button>
+    </div>
+  </section>
+
   <h2>What it can do</h2>
   <ul class="features">
     <li>Calculate net salary from gross income, for any supported tax year</li>
@@ -341,6 +400,21 @@ export function renderDocsPage(mcpUrl: string): string {
     <a href="${origin}/terms" rel="noopener">Terms of Service</a>
   </footer>
 </main>
+<script>
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = document.getElementById(btn.getAttribute("data-copy-target"));
+      if (!target) return;
+      navigator.clipboard.writeText(target.textContent).then(function () {
+        var original = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(function () {
+          btn.textContent = original;
+        }, 1500);
+      });
+    });
+  });
+</script>
 </body>
 </html>
 `;

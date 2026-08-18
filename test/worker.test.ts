@@ -50,6 +50,10 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("calculate_net_salary");
     expect(html).toContain("calculate_gross_from_net");
     expect(html).toContain("compare_scenarios");
+    // Claude Code / Codex copy-to-clipboard boxes
+    expect(html).toContain("claude mcp add --transport http dutch-tax-income-calculator https://example.com/mcp");
+    expect(html).toContain("mcp_servers.dutch-tax-income-calculator");
+    expect(html).toContain("navigator.clipboard.writeText");
     expect(html).toContain("additionalProperties");
     expect(html).toContain("targetNet");
   });
