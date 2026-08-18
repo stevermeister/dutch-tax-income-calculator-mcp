@@ -130,7 +130,7 @@ prompt into Codex chat and let it make the edit:
 
 Deployed at `thetax.nl/mcp` (path-scoped routes on the existing `thetax.nl` zone, not a custom domain — the
 rest of the site is unaffected). A human-readable documentation page with these same instructions, plus the
-full input/output schema for every tool, is served at [`thetax.nl/docs`](https://thetax.nl/docs). If you
+full input/output schema for every tool, is served at [`thetax.nl/mcp/docs`](https://thetax.nl/mcp/docs). If you
 deploy your own copy, replace the URL with the workers.dev subdomain `npm run deploy` assigns (or your own
 domain/route).
 
@@ -140,7 +140,7 @@ domain/route).
 src/
   index.ts          Worker fetch handler: per-IP rate limit + createMcpHandler(createServer)
   server.ts          createServer() factory — registers the 3 tools and the tax://brackets/{year} resource
-  docs-page.ts        Renders the /docs page (setup instructions + full tool schemas)
+  docs-page.ts        Renders the /mcp/docs page (setup instructions + full tool schemas)
   privacy-page.ts     Renders the /privacy policy
   terms-page.ts       Renders the /terms of service
   icon.ts             Base64-embedded PNG served at /mcp/icon.png
@@ -160,10 +160,11 @@ test/                 Vitest unit tests + Worker-level MCP/HTTP integration test
 | Path | Purpose |
 |---|---|
 | `/mcp` | MCP Streamable HTTP endpoint |
-| `/docs` | Documentation: setup instructions + full tool schemas |
+| `/mcp/docs` | Documentation: setup instructions + full tool schemas |
 | `/privacy` | Privacy policy |
 | `/terms` | Terms of service |
 | `/mcp/icon.png` | Connector icon |
 | `/.well-known/openai-apps-challenge` | OpenAI App Directory domain-verification token (404 until `OPENAI_APPS_CHALLENGE_TOKEN` is set) |
 
-`/mcp/setup(.html)`, `/mcp/privacy.html`, and `/mcp/terms.html` redirect to the routes above for continuity.
+`/docs`, `/mcp/setup(.html)`, `/mcp/privacy.html`, and `/mcp/terms.html` redirect to the routes above for
+continuity.

@@ -8,19 +8,21 @@ import { ICON_PNG_BASE64 } from "./icon";
 import type { Env } from "./env";
 
 const MCP_ROUTE = "/mcp";
-const DOCS_ROUTE = "/docs";
+const DOCS_ROUTE = "/mcp/docs";
 const PRIVACY_ROUTE = "/privacy";
 const TERMS_ROUTE = "/terms";
 const ICON_ROUTE = "/mcp/icon.png";
 const OPENAI_CHALLENGE_ROUTE = "/.well-known/openai-apps-challenge";
 
 // Paths content used to live at, before consolidating onto clean top-level
-// URLs (/docs, /privacy, /terms) for the ChatGPT App Directory submission.
-// Redirected, not removed, so anything that already linked the old paths
-// keeps working.
+// URLs (/privacy, /terms) for the ChatGPT App Directory submission, or (for
+// docs) moving under /mcp/* to avoid a bare top-level path that could be
+// confused with something else on the domain. Redirected, not removed, so
+// anything that already linked the old paths keeps working.
 const LEGACY_REDIRECTS: Record<string, string> = {
   "/mcp/setup": DOCS_ROUTE,
   "/mcp/setup.html": DOCS_ROUTE,
+  "/docs": DOCS_ROUTE,
   "/mcp/privacy.html": PRIVACY_ROUTE,
   "/mcp/terms.html": TERMS_ROUTE,
 };

@@ -36,8 +36,8 @@ describe("worker HTTP surface", () => {
     expect(text.toLowerCase()).toContain("not tax advice");
   });
 
-  it("serves the docs page at /docs", async () => {
-    const res = await SELF.fetch("https://example.com/docs");
+  it("serves the docs page at /mcp/docs", async () => {
+    const res = await SELF.fetch("https://example.com/mcp/docs");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const html = await res.text();
@@ -56,8 +56,9 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("navigator.clipboard.writeText");
     // Quick-jump nav: every anchor target it links to must actually exist on the page
     const navMatch = html.match(/<nav class="toc"[^>]*>([\s\S]*?)<\/nav>/);
-    expect(navMatch).toBeTruthy();
-    const hrefs = [...navMatch![1].matchAll(/href="#([\w-]+)"/g)].map((m) => m[1]);
+    const navContent = navMatch?.[1];
+    expect(navContent).toBeTruthy();
+    const hrefs = [...(navContent ?? "").matchAll(/href="#([\w-]+)"/g)].map((m) => m[1]);
     expect(hrefs.length).toBeGreaterThanOrEqual(8);
     for (const id of hrefs) {
       expect(html).toContain(`id="${id}"`);
@@ -78,7 +79,7 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("Edviso BV");
     expect(html).toContain("stevermeister@gmail.com");
 
-    const docsHtml = await (await SELF.fetch("https://example.com/docs")).text();
+    const docsHtml = await (await SELF.fetch("https://example.com/mcp/docs")).text();
     expect(docsHtml).toContain("https://example.com/privacy");
   });
 
@@ -93,16 +94,17 @@ describe("worker HTTP surface", () => {
     expect(html).toContain("Edviso BV");
     expect(html).toContain("Netherlands");
 
-    const docsHtml = await (await SELF.fetch("https://example.com/docs")).text();
+    const docsHtml = await (await SELF.fetch("https://example.com/mcp/docs")).text();
     expect(docsHtml).toContain("https://example.com/terms");
     const privacyHtml = await (await SELF.fetch("https://example.com/privacy")).text();
     expect(privacyHtml).toContain("https://example.com/terms");
   });
 
-  it("redirects the old /mcp/setup(.html), /mcp/privacy.html and /mcp/terms.html paths", async () => {
+  it("redirects the old /mcp/setup(.html), /docs, /mcp/privacy.html and /mcp/terms.html paths", async () => {
     const cases: Array<[string, string]> = [
-      ["/mcp/setup", "/docs"],
-      ["/mcp/setup.html", "/docs"],
+      ["/mcp/setup", "/mcp/docs"],
+      ["/mcp/setup.html", "/mcp/docs"],
+      ["/docs", "/mcp/docs"],
       ["/mcp/privacy.html", "/privacy"],
       ["/mcp/terms.html", "/terms"],
     ];
@@ -122,7 +124,7 @@ describe("worker HTTP surface", () => {
     // PNG magic number
     expect([bytes[0], bytes[1], bytes[2], bytes[3]]).toEqual([0x89, 0x50, 0x4e, 0x47]);
 
-    const docsHtml = await (await SELF.fetch("https://example.com/docs")).text();
+    const docsHtml = await (await SELF.fetch("https://example.com/mcp/docs")).text();
     expect(docsHtml).toContain("https://example.com/mcp/icon.png");
     const privacyHtml = await (await SELF.fetch("https://example.com/privacy")).text();
     expect(privacyHtml).toContain("https://example.com/mcp/icon.png");
@@ -140,7 +142,7 @@ describe("worker HTTP surface", () => {
         headers: { accept: "text/html,application/xhtml+xml" },
       });
       expect(res.status).toBe(302);
-      expect(res.headers.get("location")).toBe("https://example.com/docs");
+      expect(res.headers.get("location")).toBe("https://example.com/mcp/docs");
     }
   });
 

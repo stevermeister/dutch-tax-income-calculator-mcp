@@ -10,8 +10,9 @@
   // Path-scoped routes, not a Custom Domain: thetax.nl's apex is already live
   // (served via Netlify through Cloudflare DNS). These only claim the exact
   // paths below — everything else keeps going to Netlify untouched. Each
-  // extra top-level path (docs/privacy/terms/well-known challenge) needs its
-  // own explicit route entry; a wildcard here would only match nested paths.
+  // extra top-level path needs its own explicit route entry; a wildcard here
+  // would only match nested paths. "/docs" is kept only to 302 legacy links
+  // to the current /mcp/docs (already covered by the mcp* wildcard below).
   "routes": [
     "thetax.nl/mcp*",
     "thetax.nl/docs",
